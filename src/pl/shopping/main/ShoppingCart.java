@@ -2,14 +2,16 @@ package pl.shopping.main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ShoppingCart implements ShoppingCartOperation {
 
     private final List<Product> products = new ArrayList<>();
+    private final int NO_PRODUCT = 0;
 
     @Override
     public boolean addProducts(String productName, int price, int quantity) {
-        if(getCurrentQuantity() + quantity > PRODUCTS_LIMIT || quantity <= 0 || price <= 0 || productName.isEmpty()) {
+        if (getCurrentQuantity() + quantity > PRODUCTS_LIMIT || quantity <= 0 || price <= 0 || productName.isEmpty()) {
             return false;
         }
         if (isAlreadyInCart(productName)) {
@@ -27,12 +29,37 @@ public class ShoppingCart implements ShoppingCartOperation {
 
     @Override
     public boolean deleteProducts(String productName, int quantity) {
-        return false;
+
+        if (quantity <= 0) {
+            return false;
+        }
+
+        Optional<Product> product = products.stream()
+                .filter(p -> p.getProductName().equals(productName))
+                .findFirst();
+
+        return product
+                .map(p -> {
+                    if (quantity > p.getQuantity()) {
+                        return false;
+                    } else {
+                        p.setQuantity(p.getQuantity() - quantity);
+                    }
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override
     public int getQuantityOfProduct(String productName) {
-        return 0;
+
+        Optional<Product> product = products.stream()
+                .filter(p -> p.getProductName().equals(productName))
+                .findFirst();
+
+        return product
+                .map(Product::getQuantity)
+                .orElse(NO_PRODUCT);
     }
 
     @Override
