@@ -110,15 +110,59 @@ class ShoppingCartTestSpec extends Specification {
         "Tea"       | 0
     }
 
-    def "GetSumProductsPrices"() {
+    def "shouldGetSumProductsPrices"() {
+        given:
+        def shoppingCart = new ShoppingCart()
+        shoppingCart.addProducts("Apple", 5, 3)
+        shoppingCart.addProducts('Tea', 10, 1)
+
+        expect:
+        shoppingCart.getSumProductsPrices() == 25
     }
 
-    def "GetProductPrice"() {
+    def "shouldGetProductPrice"() {
+        given:
+        def shoppingCart = new ShoppingCart()
+        shoppingCart.addProducts("Apple", 5, 4)
+        shoppingCart.addProducts("Milk", 10, 2)
+
+        expect:
+        shoppingCart.getProductPrice(productName) == expected
+
+        where:
+        productName | expected
+        "Apple"     | 20
+        "Milk"      | 20
     }
 
     def "GetProductsNames"() {
+        given:
+        def shoppingCart = new ShoppingCart()
+        shoppingCart.addProducts("Apple", 5, 4)
+        shoppingCart.addProducts("Milk", 10, 2)
+        shoppingCart.addProducts("Tea", 5, 4)
+        shoppingCart.addProducts("Coffee", 10, 2)
+
+        when:
+        List<String> shoppingCartList = shoppingCart.getProductsNames()
+
+        then:
+        shoppingCartList.get(0) == "Apple"
+        shoppingCartList.get(1) == "Milk"
+        shoppingCartList.get(2) == "Tea"
+        shoppingCartList.get(3) == "Coffee"
     }
 
-    def "GetCurrentQuantity"() {
+    def "shouldNotGetProductsNames"() {
+        given:
+        def shoppingCart = new ShoppingCart()
+
+        when:
+        List<String> shoppingCartList = shoppingCart.getProductsNames()
+
+        then:
+        shoppingCartList.size() == 0
+
     }
+
 }

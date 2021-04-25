@@ -1,8 +1,11 @@
 package pl.shopping.main;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class ShoppingCart implements ShoppingCartOperation {
 
@@ -34,9 +37,7 @@ public class ShoppingCart implements ShoppingCartOperation {
             return false;
         }
 
-        Optional<Product> product = products.stream()
-                .filter(p -> p.getProductName().equals(productName))
-                .findFirst();
+        Optional<Product> product = getProduct(productName);
 
         return product
                 .map(p -> {
@@ -53,9 +54,7 @@ public class ShoppingCart implements ShoppingCartOperation {
     @Override
     public int getQuantityOfProduct(String productName) {
 
-        Optional<Product> product = products.stream()
-                .filter(p -> p.getProductName().equals(productName))
-                .findFirst();
+        Optional<Product> product = getProduct(productName);
 
         return product
                 .map(Product::getQuantity)
@@ -64,17 +63,30 @@ public class ShoppingCart implements ShoppingCartOperation {
 
     @Override
     public int getSumProductsPrices() {
-        return 0;
+
+        return products.stream()
+                .map(product -> product.getQuantity() * product.getPrice())
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     @Override
     public int getProductPrice(String productName) {
-        return 0;
+        Optional<Product> product = getProduct(productName);
+
+        return product.map(p -> p.getPrice() * p.getQuantity())
+                .orElse(NO_PRODUCT);
     }
 
     @Override
     public List<String> getProductsNames() {
-        return null;
+        Optional.ofNullable(this.products)
+                .orElse(Collections.emptyList());
+
+        return products.stream()
+                .map(Product::getProductName)
+                .collect(Collectors.toList());
+
     }
 
     public int getCurrentQuantity() {
@@ -86,6 +98,12 @@ public class ShoppingCart implements ShoppingCartOperation {
     private boolean isAlreadyInCart(String productName) {
         return products.stream()
                 .anyMatch(product -> product.getProductName().equals(productName));
+    }
+
+    private Optional<Product> getProduct(String productName) {
+        return products.stream()
+                .filter(p -> p.getProductName().equals(productName))
+                .findAny();
     }
 
 }
