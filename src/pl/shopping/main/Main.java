@@ -6,7 +6,8 @@ public class Main {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.addProducts("Orange", 12, 5);
         shoppingCart.addProducts("Apple", 12, 499);
-        shoppingCart.addProducts("Milk", 12, 2);
 
+        shoppingCart.addProducts("Milk", 12, 2);
+        shoppingCart.deleteProducts("Apple", 12);
     }
 }
